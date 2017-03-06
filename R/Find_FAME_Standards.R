@@ -12,7 +12,7 @@
 #' @export
 
 
-Find_FAME_Standards<-function(inputFileList, FAME_Frame=system.file("extdata", "FIND_FAME_FRAME.txt", package="CooperR2DGC"), numCores=4, RT1Penalty=1, RT2Penalty=10, similarityCutoffWarningThreshold=85){
+Find_FAME_Standards<-function(inputFileList, FAME_Frame=system.file("extdata", "FIND_FAME_FRAME.txt", package="CooperR2DGC"), numCores=4, RT1Penalty=1, RT2Penalty=10, similarityCutoffWarningThreshold=80){
   FAMES<-read.table(FAME_Frame,sep="\t",header=T)
   FAMES[,2]<-as.character(FAMES[,2])
   RTSplit<-data.frame(strsplit(FAMES[,2], " , "), stringsAsFactors = F)
@@ -32,8 +32,6 @@ Find_FAME_Standards<-function(inputFileList, FAME_Frame=system.file("extdata", "
   for(File in inputFileList){
     print(File)
     currentRawFile<-read.table(File, sep="\t", fill=T, quote="",strip.white = T, stringsAsFactors = F,header=T)
-    currentRawFile<-currentRawFile[,-4]
-    currentRawFile<- currentRawFile[,c(1,2,3,5,4)]
     currentRawFile[,4]<-as.character(currentRawFile[,4])
     currentRawFile<-currentRawFile[which(!is.na(currentRawFile[,3])&nchar(currentRawFile[,4])!=0),]
     currentRawFile[,2]<-as.character(currentRawFile[,2])
@@ -66,7 +64,7 @@ Find_FAME_Standards<-function(inputFileList, FAME_Frame=system.file("extdata", "
     RT1Index<-matrix(unlist(lapply(currentRawFile[,6],function(x) abs(x-FAMES[,4])*RT1Penalty)),nrow=nrow(FAMES))
     RT2Index<-matrix(unlist(lapply(currentRawFile[,7],function(x) abs(x-FAMES[,5])*RT2Penalty)),nrow=nrow(FAMES))
     SimilarityMatrix<-SimilarityMatrix-RT1Index-RT2Index
-    if(sum(apply(SimilarityMatrix,1,max)<85)>1){
+    if(sum(apply(SimilarityMatrix,1,max)<similarityCutoffWarningThreshold)>1){
       message(paste0("Potential Problem Match: ", FAMES[which(apply(SimilarityMatrix,1,max)<similarityCutoffWarningThreshold),1], "  "))
     }
     currentRawFile[apply(SimilarityMatrix,1,which.max),1]<-as.character(FAMES[,1])

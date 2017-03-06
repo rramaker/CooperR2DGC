@@ -26,7 +26,7 @@ PrecompressFiles<-function(inputFileList, RT1Penalty=1, RT2Penalty=10,similarity
 
 
   for(File in inputFileList){
-
+    print(File)
     #Read in file
     currentRawFile<-read.table(File, sep="\t", fill=T, quote="",strip.white = T, stringsAsFactors = F,header=T)
     currentRawFile[,4]<-as.character(currentRawFile[,4])

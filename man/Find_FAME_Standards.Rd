@@ -6,7 +6,7 @@
 \usage{
 Find_FAME_Standards(inputFileList, FAME_Frame = system.file("extdata",
   "FIND_FAME_FRAME.txt", package = "CooperR2DGC"), numCores = 4,
-  RT1Penalty = 1, RT2Penalty = 10, similarityCutoffWarningThreshold = 85)
+  RT1Penalty = 1, RT2Penalty = 10, similarityCutoffWarningThreshold = 80)
 }
 \arguments{
 \item{inputFileList}{Vector of file paths to scan for FAME standards}
