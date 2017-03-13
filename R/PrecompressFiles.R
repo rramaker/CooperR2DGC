@@ -29,8 +29,8 @@ PrecompressFiles<-function(inputFileList, RT1Penalty=1, RT2Penalty=10,similarity
     print(File)
     #Read in file
     currentRawFile<-read.table(File, sep="\t", fill=T, quote="",strip.white = T, stringsAsFactors = F,header=T)
-    currentRawFile[,4]<-as.character(currentRawFile[,4])
-    currentRawFile<-currentRawFile[which(!is.na(currentRawFile[,3])&nchar(currentRawFile[,4])!=0),]
+    currentRawFile[,5]<-as.character(currentRawFile[,5])
+    currentRawFile<-currentRawFile[which(!is.na(currentRawFile[,3])&nchar(currentRawFile[,5])!=0),]
     currentRawFile[,2]<-as.character(currentRawFile[,2])
 
     #Parse retention times
@@ -47,7 +47,7 @@ PrecompressFiles<-function(inputFileList, RT1Penalty=1, RT2Penalty=10,similarity
 
     #Parse metabolite spectra into a list
     currentRawFileSplit<-split(currentRawFile,1:nrow(currentRawFile))
-    spectraSplit<-lapply(currentRawFileSplit, function(a) strsplit(a[[4]]," "))
+    spectraSplit<-lapply(currentRawFileSplit, function(a) strsplit(a[[5]]," "))
     spectraSplit<-lapply(spectraSplit, function(b) lapply(b, function(c) strsplit(c,":")))
     spectraSplit<-lapply(spectraSplit, function(d) t(matrix(unlist(d),nrow=2)))
     spectraSplit<-lapply(spectraSplit, function(d) d[order(d[,1]),])
@@ -76,7 +76,7 @@ PrecompressFiles<-function(inputFileList, RT1Penalty=1, RT2Penalty=10,similarity
 
         #Find mates to combine
         Mates<-lapply(MatchList,function(x) x[1])
-        BindingQMs<-currentRawFile[unlist(Mates[which(!is.na(Mates))]),5]
+        BindingQMs<-currentRawFile[unlist(Mates[which(!is.na(Mates))]),4]
         BindingAreas<-currentRawFile[unlist(Mates[which(!is.na(Mates))]),3]
         BindingSpectra<-spectraSplit[unlist(Mates[which(!is.na(Mates))])]
 
@@ -85,7 +85,7 @@ PrecompressFiles<-function(inputFileList, RT1Penalty=1, RT2Penalty=10,similarity
         #Add peak info to combinedList to for output
         combinedList[[File]]<-cbind(toBind,currentRawFile[unlist(Mates[which(!is.na(Mates))]),],File)
         toBind[,"Bound"]<-rep(NA, nrow(toBind))
-        toBindQMs<-toBind[,5]
+        toBindQMs<-toBind[,4]
         toBindSpectra<-spectraSplit[which(!is.na(Mates))]
 
         #Perform proportional conversion to adjust peak areas with differing unique masses
@@ -135,7 +135,7 @@ PrecompressFiles<-function(inputFileList, RT1Penalty=1, RT2Penalty=10,similarity
         #Repeat similarity scores with combined peaks
         row.names(currentRawFile)<-c(1:nrow(currentRawFile))
         currentRawFileSplit<-split(currentRawFile,1:nrow(currentRawFile))
-        spectraSplit<-lapply(currentRawFileSplit,function(a) strsplit(a[[4]]," "))
+        spectraSplit<-lapply(currentRawFileSplit,function(a) strsplit(a[[5]]," "))
         spectraSplit<-lapply(spectraSplit, function(b) lapply(b, function(c) strsplit(c,":")))
         spectraSplit<-lapply(spectraSplit, function(d) t(matrix(unlist(d),nrow=2)))
         spectraSplit<-lapply(spectraSplit, function(d) d[order(d[,1]),])
@@ -153,13 +153,13 @@ PrecompressFiles<-function(inputFileList, RT1Penalty=1, RT2Penalty=10,similarity
         if(length(MatchList)>0){
           if(quantMethod=="U"){
             Mates<-lapply(MatchList,function(x) x[1])
-            BindingQMs<-currentRawFile[unlist(Mates[which(!is.na(Mates))]),5]
+            BindingQMs<-currentRawFile[unlist(Mates[which(!is.na(Mates))]),4]
             BindingAreas<-currentRawFile[unlist(Mates[which(!is.na(Mates))]),3]
             BindingSpectra<-spectraSplit[unlist(Mates[which(!is.na(Mates))])]
             toBind<-currentRawFile[which(!is.na(Mates)),]
             combinedList[[File]]<-rbind(combinedList[[File]],cbind(toBind,currentRawFile[unlist(Mates[which(!is.na(Mates))]),],File))
             toBind[,"Bound"]<-rep(NA, nrow(toBind))
-            toBindQMs<-toBind[,5]
+            toBindQMs<-toBind[,4]
             toBindSpectra<-spectraSplit[which(!is.na(Mates))]
             ConvNumerator<-unlist(lapply(1:length(toBindQMs), function(x) toBindSpectra[[x]][which(toBindSpectra[[x]][,1]==toBindQMs[x]),2]))
             ConvDenominator<-unlist(lapply(1:length(toBindQMs), function(x) toBindSpectra[[x]][which(toBindSpectra[[x]][,1]==BindingQMs[x]),2]))

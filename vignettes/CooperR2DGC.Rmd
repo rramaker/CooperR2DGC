@@ -158,23 +158,23 @@ system.file("extdata", "SampleB.txt", package="R2DGC")
 These are tab separated files with a header describing each column as is standard output from Chromatof software. I've constructed a table representing the first three lines of the SampleA file to demonstrate each of the 5 required columns in the input file:
 <br><br>
 <center>
-Name            | Retention Times |   Area  |     Spectra       | | | |Quant Mass/Apexing Masses
-----------------|-----------------|---------|-------------------|-|-|-|------------------------
-Alanine         |  540 , 2.810    |1798077  |116:44973 73:387722| | | |     T
-FAME_8          |  560 , 3.220    |33713901 |74:522236 87:195537| | | |     T
-Valine          |  700 , 2.830    |1050266  |73:26438 144:18832 | | | |     T
+Name            | Retention Times |   Area  |Quant Mass/Apexing Masses|     Spectra       
+----------------|-----------------|---------|-------------------------|------------------------
+Alanine         |  540 , 2.810    |1798077  |     T                   |116:44973 73:387722 ...
+FAME_8          |  560 , 3.220    |33713901 |     T                   |74:522236 87:195537 ...
+Valine          |  700 , 2.830    |1050266  |     T                   |73:26438 144:18832 ...
 </center>
 <br><br>
 
-As shown above the five required columns (the order shown is required) are the peak name, retention time (outputted by Chromatof as first retention time, second retention time), peak area, mass spectra (cutoff after the first two masses to save space), and quant mass. All of these columns can be specified as output in the data processing method used by the Chromatof software and do not need to be altered post-output. The fifth column is the only column that might change depending on the data processing method used. Chromatof allows for three different methods for quantifying peak areas. The simplest is the total ion chromatogram (TIC), which uses all ions to compute the peak area. This method has no unique quant mass, thus Chromatof outputs "T" for the quant mass as shown above. The second is the unique mass method, which uses an ion relatively unique to a peak to compute the area for a peak in an effort to improve resolution of overlapping peaks. Chromatof will output the unique mass used to compute peak area in the quant mass column if this method is selected as shown below:
+As shown above the five required columns (the order shown is required) are the peak name, retention time (outputted by Chromatof as first retention time, second retention time), peak area, quant mass, and mass spectra (cutoff after the first two masses to save space). All of these columns can be specified as output in the data processing method used by the Chromatof software and do not need to be altered post-output. The fourth column is the only column that might change depending on the data processing method used. Chromatof allows for three different methods for quantifying peak areas. The simplest is the total ion chromatogram (TIC), which uses all ions to compute the peak area. This method has no unique quant mass, thus Chromatof outputs "T" for the quant mass as shown above. The second is the unique mass method, which uses an ion relatively unique to a peak to compute the area for a peak in an effort to improve resolution of overlapping peaks. Chromatof will output the unique mass used to compute peak area in the quant mass column if this method is selected as shown below:
 
 <br><br>
 <center>
-Name            | Retention Times |   Area  |     Spectra       | | | |Quant Mass/Apexing Masses
-----------------|-----------------|---------|-------------------|-|-|-|------------------------
-Alanine         |  540 , 2.810    |1798077  |116:44973 73:387722| | | |     116
-FAME_8          |  560 , 3.220    |33713901 |74:522236 87:195537| | | |     74
-Valine          |  700 , 2.830    |1050266  |73:26438 144:18832 | | | |     73
+Name            | Retention Times |   Area  |Quant Mass/Apexing Masses|     Spectra       
+----------------|-----------------|---------|-------------------------|------------------------
+Alanine         |  540 , 2.810    |1798077  |     116                 |116:44973 73:387722 ...
+FAME_8          |  560 , 3.220    |33713901 |     74                  |74:522236 87:195537 ...
+Valine          |  700 , 2.830    |1050266  |     73                  |73:26438 144:18832 ...
 </center>
 <br><br>
 
@@ -182,11 +182,12 @@ The final method, apexing masses, is a compromise of the first two. This approac
 
 <br><br>
 <center>
-Name            | Retention Times |   Area  |     Spectra       | | | |Quant Mass/Apexing Masses
-----------------|-----------------|---------|-------------------|-|-|-|------------------------
-Alanine         |  540 , 2.810    |1798077  |116:44973 73:387722| | | |     116:73
-FAME_8          |  560 , 3.220    |33713901 |74:522236 87:195537| | | |     74:87:75:101
-Valine          |  700 , 2.830    |1050266  |73:26438 144:18832 | | | |     73:144:75
+Name            | Retention Times |   Area  |Quant Mass/Apexing Masses|     Spectra       
+----------------|-----------------|---------|-------------------------|------------------------
+Alanine         |  540 , 2.810    |1798077  |   116:73                |116:44973 73:387722 ...
+FAME_8          |  560 , 3.220    |33713901 |   74:87:75:101          |74:522236 87:195537 ...
+Valine          |  700 , 2.830    |1050266  |   73:144:75             |73:26438 144:18832 ...
+
 </center>
 <br><br>
 

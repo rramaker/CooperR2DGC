@@ -216,11 +216,8 @@ install_github(&quot;rramaker/R2DGC&quot;)</code></pre>
 <th>Name</th>
 <th>Retention Times</th>
 <th>Area</th>
-<th>Spectra</th>
-<th></th>
-<th></th>
-<th></th>
 <th>Quant Mass/Apexing Masses</th>
+<th>Spectra</th>
 </tr>
 </thead>
 <tbody>
@@ -228,37 +225,28 @@ install_github(&quot;rramaker/R2DGC&quot;)</code></pre>
 <td>Alanine</td>
 <td>540 , 2.810</td>
 <td>1798077</td>
-<td>116:44973 73:387722</td>
-<td></td>
-<td></td>
-<td></td>
 <td>T</td>
+<td>116:44973 73:387722 …</td>
 </tr>
 <tr class="even">
 <td>FAME_8</td>
 <td>560 , 3.220</td>
 <td>33713901</td>
-<td>74:522236 87:195537</td>
-<td></td>
-<td></td>
-<td></td>
 <td>T</td>
+<td>74:522236 87:195537 …</td>
 </tr>
 <tr class="odd">
 <td>Valine</td>
 <td>700 , 2.830</td>
 <td>1050266</td>
-<td>73:26438 144:18832</td>
-<td></td>
-<td></td>
-<td></td>
 <td>T</td>
+<td>73:26438 144:18832 …</td>
 </tr>
 </tbody>
 </table>
 </center>
 <p><br><br></p>
-<p>As shown above the five required columns (the order shown is required) are the peak name, retention time (outputted by Chromatof as first retention time, second retention time), peak area, mass spectra (cutoff after the first two masses to save space), and quant mass. All of these columns can be specified as output in the data processing method used by the Chromatof software and do not need to be altered post-output. The fifth column is the only column that might change depending on the data processing method used. Chromatof allows for three different methods for quantifying peak areas. The simplest is the total ion chromatogram (TIC), which uses all ions to compute the peak area. This method has no unique quant mass, thus Chromatof outputs “T” for the quant mass as shown above. The second is the unique mass method, which uses an ion relatively unique to a peak to compute the area for a peak in an effort to improve resolution of overlapping peaks. Chromatof will output the unique mass used to compute peak area in the quant mass column if this method is selected as shown below:</p>
+<p>As shown above the five required columns (the order shown is required) are the peak name, retention time (outputted by Chromatof as first retention time, second retention time), peak area, quant mass, and mass spectra (cutoff after the first two masses to save space). All of these columns can be specified as output in the data processing method used by the Chromatof software and do not need to be altered post-output. The fourth column is the only column that might change depending on the data processing method used. Chromatof allows for three different methods for quantifying peak areas. The simplest is the total ion chromatogram (TIC), which uses all ions to compute the peak area. This method has no unique quant mass, thus Chromatof outputs “T” for the quant mass as shown above. The second is the unique mass method, which uses an ion relatively unique to a peak to compute the area for a peak in an effort to improve resolution of overlapping peaks. Chromatof will output the unique mass used to compute peak area in the quant mass column if this method is selected as shown below:</p>
 <br><br>
 <center>
 <table>
@@ -267,11 +255,8 @@ install_github(&quot;rramaker/R2DGC&quot;)</code></pre>
 <th>Name</th>
 <th>Retention Times</th>
 <th>Area</th>
-<th>Spectra</th>
-<th></th>
-<th></th>
-<th></th>
 <th>Quant Mass/Apexing Masses</th>
+<th>Spectra</th>
 </tr>
 </thead>
 <tbody>
@@ -279,31 +264,22 @@ install_github(&quot;rramaker/R2DGC&quot;)</code></pre>
 <td>Alanine</td>
 <td>540 , 2.810</td>
 <td>1798077</td>
-<td>116:44973 73:387722</td>
-<td></td>
-<td></td>
-<td></td>
 <td>116</td>
+<td>116:44973 73:387722 …</td>
 </tr>
 <tr class="even">
 <td>FAME_8</td>
 <td>560 , 3.220</td>
 <td>33713901</td>
-<td>74:522236 87:195537</td>
-<td></td>
-<td></td>
-<td></td>
 <td>74</td>
+<td>74:522236 87:195537 …</td>
 </tr>
 <tr class="odd">
 <td>Valine</td>
 <td>700 , 2.830</td>
 <td>1050266</td>
-<td>73:26438 144:18832</td>
-<td></td>
-<td></td>
-<td></td>
 <td>73</td>
+<td>73:26438 144:18832 …</td>
 </tr>
 </tbody>
 </table>
@@ -318,11 +294,8 @@ install_github(&quot;rramaker/R2DGC&quot;)</code></pre>
 <th>Name</th>
 <th>Retention Times</th>
 <th>Area</th>
-<th>Spectra</th>
-<th></th>
-<th></th>
-<th></th>
 <th>Quant Mass/Apexing Masses</th>
+<th>Spectra</th>
 </tr>
 </thead>
 <tbody>
@@ -330,31 +303,22 @@ install_github(&quot;rramaker/R2DGC&quot;)</code></pre>
 <td>Alanine</td>
 <td>540 , 2.810</td>
 <td>1798077</td>
-<td>116:44973 73:387722</td>
-<td></td>
-<td></td>
-<td></td>
 <td>116:73</td>
+<td>116:44973 73:387722 …</td>
 </tr>
 <tr class="even">
 <td>FAME_8</td>
 <td>560 , 3.220</td>
 <td>33713901</td>
-<td>74:522236 87:195537</td>
-<td></td>
-<td></td>
-<td></td>
 <td>74:87:75:101</td>
+<td>74:522236 87:195537 …</td>
 </tr>
 <tr class="odd">
 <td>Valine</td>
 <td>700 , 2.830</td>
 <td>1050266</td>
-<td>73:26438 144:18832</td>
-<td></td>
-<td></td>
-<td></td>
 <td>73:144:75</td>
+<td>73:26438 144:18832 …</td>
 </tr>
 </tbody>
 </table>

@@ -45,8 +45,8 @@ ConsensusAlign<-function(inputFileList,
     message(paste(seed, "seed"))
     #Read in and format seed file
     seedRawFile<-read.table(inputFileList[seed], sep="\t", fill=T, quote="",strip.white = T, stringsAsFactors = F,header=T)
-    seedRawFile[,4]<-as.character(seedRawFile[,4])
-    seedRawFile<-seedRawFile[which(!is.na(seedRawFile[,3])&nchar(seedRawFile[,4])!=0),]
+    seedRawFile[,5]<-as.character(seedRawFile[,5])
+    seedRawFile<-seedRawFile[which(!is.na(seedRawFile[,3])&nchar(seedRawFile[,5])!=0),]
     seedRawFile[,2]<-as.character(seedRawFile[,2])
 
     #Parse seed file retention time
@@ -90,7 +90,7 @@ ConsensusAlign<-function(inputFileList,
 
     #Parse seed file metabolite spectra
     currentRawFileSplit<-split(seedRawFile,1:nrow(seedRawFile))
-    SeedspectraSplit<-lapply(currentRawFileSplit, function(a) strsplit(a[[4]]," "))
+    SeedspectraSplit<-lapply(currentRawFileSplit, function(a) strsplit(a[[5]]," "))
     SeedspectraSplit<-lapply(SeedspectraSplit, function(b) lapply(b, function(c) strsplit(c,":")))
     SeedspectraSplit<-lapply(SeedspectraSplit, function(d) t(matrix(unlist(d),nrow=2)))
     SeedspectraSplit<-lapply(SeedspectraSplit, function(d) d[order(d[,1]),])
@@ -118,8 +118,8 @@ ConsensusAlign<-function(inputFileList,
 
       #Read in file
       currentRawFile<-read.table(File, sep="\t", fill=T, quote="",strip.white = T, stringsAsFactors = F,header=T)
-      currentRawFile[,4]<-as.character(currentRawFile[,4])
-      currentRawFile<-currentRawFile[which(!is.na(currentRawFile[,3])&nchar(currentRawFile[,4])!=0),]
+      currentRawFile[,5]<-as.character(currentRawFile[,5])
+      currentRawFile<-currentRawFile[which(!is.na(currentRawFile[,3])&nchar(currentRawFile[,5])!=0),]
       currentRawFile[,2]<-as.character(currentRawFile[,2])
 
       #Parse retention times
@@ -159,7 +159,7 @@ ConsensusAlign<-function(inputFileList,
 
       #Parse metabolite spectra
       currentRawFileSplit<-split(currentRawFile,1:nrow(currentRawFile))
-      spectraSplit<-lapply(currentRawFileSplit, function(a) strsplit(a[[4]]," "))
+      spectraSplit<-lapply(currentRawFileSplit, function(a) strsplit(a[[5]]," "))
       spectraSplit<-lapply(spectraSplit, function(b) lapply(b, function(c) strsplit(c,":")))
       spectraSplit<-lapply(spectraSplit, function(d) t(matrix(unlist(d),nrow=2)))
       spectraSplit<-lapply(spectraSplit, function(d) d[order(d[,1]),])
@@ -232,8 +232,8 @@ ConsensusAlign<-function(inputFileList,
 
       if(quantMethod=="U"){
         #Find quant masses for each match pair
-        MatchedSeedQMs<- seedRawFile[,5][Mates[which(MatchScores>=similarityCutoff)]]
-        currentFileQMs<- currentRawFile[which(MatchScores>=similarityCutoff),5]
+        MatchedSeedQMs<- seedRawFile[,4][Mates[which(MatchScores>=similarityCutoff)]]
+        currentFileQMs<- currentRawFile[which(MatchScores>=similarityCutoff),4]
         #Add incongruent quant mass info to MissingQMList for output
         MissingQMList[[File]]<-cbind(File,which(MatchScores>=similarityCutoff),currentFileQMs,inputFileList[seedFile],Mates[which(MatchScores>=similarityCutoff)],MatchedSeedQMs)[which(currentFileQMs!=MatchedSeedQMs),]
         #Convert areas proportionally for incongruent quant masses
@@ -255,8 +255,8 @@ ConsensusAlign<-function(inputFileList,
           sum(unlist(SeedQMs)%in%unlist(FileQMs))/min(length(unlist(SeedQMs)),length(unlist(FileQMs)))<0.5
         }
         #Test apexing mass overlap for each metabolite match
-        MatchedSeedQMs<- seedRawFile[,5][Mates[which(MatchScores>=similarityCutoff)]]
-        currentFileQMs<- currentRawFile[which(MatchScores>=similarityCutoff),5]
+        MatchedSeedQMs<- seedRawFile[,4][Mates[which(MatchScores>=similarityCutoff)]]
+        currentFileQMs<- currentRawFile[which(MatchScores>=similarityCutoff),4]
         QM_Bind<-cbind(MatchedSeedQMs,currentFileQMs)
         QM_Match<-apply(QM_Bind, 1, function(x) TestQMOverlap(x))
         #Add incongruent apexing masses to MissingQMList for output
@@ -296,8 +296,8 @@ ConsensusAlign<-function(inputFileList,
 
       #read in file
       currentRawFile<-read.table(File, sep="\t", fill=T, quote="",strip.white = T, stringsAsFactors = F, header=T)
-      currentRawFile[,4]<-as.character(currentRawFile[,4])
-      currentRawFile<-currentRawFile[which(!is.na(currentRawFile[,3])&nchar(currentRawFile[,4])!=0),]
+      currentRawFile[,5]<-as.character(currentRawFile[,5])
+      currentRawFile<-currentRawFile[which(!is.na(currentRawFile[,3])&nchar(currentRawFile[,5])!=0),]
       currentRawFile[,2]<-as.character(currentRawFile[,2])
 
       #Parse retention times
@@ -329,7 +329,7 @@ ConsensusAlign<-function(inputFileList,
 
         #Parse metabolite spectra
         currentRawFileSplit<-split(currentRawFile,1:nrow(currentRawFile))
-        spectraSplit<-lapply(currentRawFileSplit, function(a) strsplit(a[[4]]," "))
+        spectraSplit<-lapply(currentRawFileSplit, function(a) strsplit(a[[5]]," "))
         spectraSplit<-lapply(spectraSplit, function(b) lapply(b, function(c) strsplit(c,":")))
         spectraSplit<-lapply(spectraSplit, function(d) t(matrix(unlist(d),nrow=2)))
         spectraSplit<-lapply(spectraSplit, function(d) d[order(d[,1]),])
@@ -379,8 +379,8 @@ ConsensusAlign<-function(inputFileList,
         if(length(which(MatchScores>=similarityCutoff))>0){
           if(quantMethod=="U"){
             #Find quant masses for each match pair
-            MatchedSeedQMs<- seedRawFile[,5][Mates[which(MatchScores>=similarityCutoff)]]
-            currentFileQMs<- currentRawFile[which(MatchScores>=similarityCutoff),5]
+            MatchedSeedQMs<- seedRawFile[,4][Mates[which(MatchScores>=similarityCutoff)]]
+            currentFileQMs<- currentRawFile[which(MatchScores>=similarityCutoff),4]
             #Add incongruent quant mass info to MissingQMList for output
             MissingQMList[[paste0(File,"_MPF")]]<-cbind(File,which(MatchScores>=similarityCutoff),currentFileQMs,inputFileList[seedFile],Mates[which(MatchScores>=similarityCutoff)],MatchedSeedQMs)[which(currentFileQMs!=MatchedSeedQMs),]
             #Convert areas proportionally for incongruent quant masses
@@ -401,8 +401,8 @@ ConsensusAlign<-function(inputFileList,
               return(sum(unlist(SeedQMs)%in%unlist(FileQMs))/min(length(unlist(SeedQMs)),length(unlist(FileQMs)))<0.5)
             }
             #Test apexing mass overlap for each metabolite match
-            MatchedSeedQMs<- seedRawFile[,5][Mates[which(MatchScores>=similarityCutoff)]]
-            currentFileQMs<- currentRawFile[which(MatchScores>=similarityCutoff),5]
+            MatchedSeedQMs<- seedRawFile[,4][Mates[which(MatchScores>=similarityCutoff)]]
+            currentFileQMs<- currentRawFile[which(MatchScores>=similarityCutoff),4]
             QM_Bind<-cbind(MatchedSeedQMs,currentFileQMs)
             QM_Match<-apply(QM_Bind, 1, function(x) TestQMOverlap(x))
             #Add incongruent apexing masses to MissingQMList for output
@@ -464,7 +464,7 @@ ConsensusAlign<-function(inputFileList,
 
     #Parse seed file spectras
     peakSplit<-split(seedRawFile,1:nrow(seedRawFile))
-    peakSpectraSplit<-lapply(peakSplit, function(a) strsplit(a[[4]]," "))
+    peakSpectraSplit<-lapply(peakSplit, function(a) strsplit(a[[5]]," "))
     peakSpectraSplit<-lapply(peakSpectraSplit, function(b) lapply(b, function(c) strsplit(c,":")))
     peakSpectraSplit<-lapply(peakSpectraSplit, function(d) t(matrix(unlist(d),nrow=2)))
     peakSpectraSplit<-lapply(peakSpectraSplit, function(d) d[order(d[,1]),])

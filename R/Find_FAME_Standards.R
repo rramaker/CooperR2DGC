@@ -32,8 +32,8 @@ Find_FAME_Standards<-function(inputFileList, FAME_Frame=system.file("extdata", "
   for(File in inputFileList){
     print(File)
     currentRawFile<-read.table(File, sep="\t", fill=T, quote="",strip.white = T, stringsAsFactors = F,header=T)
-    currentRawFile[,4]<-as.character(currentRawFile[,4])
-    currentRawFile<-currentRawFile[which(!is.na(currentRawFile[,3])&nchar(currentRawFile[,4])!=0),]
+    currentRawFile[,5]<-as.character(currentRawFile[,5])
+    currentRawFile<-currentRawFile[which(!is.na(currentRawFile[,3])&nchar(currentRawFile[,5])!=0),]
     currentRawFile[,2]<-as.character(currentRawFile[,2])
 
     #Parse retention times
@@ -50,7 +50,7 @@ Find_FAME_Standards<-function(inputFileList, FAME_Frame=system.file("extdata", "
 
     #Parse metabolite spectra into a list
     currentRawFileSplit<-split(currentRawFile,1:nrow(currentRawFile))
-    spectraSplit<-lapply(currentRawFileSplit, function(a) strsplit(a[[4]]," "))
+    spectraSplit<-lapply(currentRawFileSplit, function(a) strsplit(a[[5]]," "))
     spectraSplit<-lapply(spectraSplit, function(b) lapply(b, function(c) strsplit(c,":")))
     spectraSplit<-lapply(spectraSplit, function(d) t(matrix(unlist(d),nrow=2)))
     spectraSplit<-lapply(spectraSplit, function(d) d[order(d[,1]),])
