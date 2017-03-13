@@ -18,7 +18,7 @@ FeihnMatch<-function(PeakInfoTable, FeihnLibrary, numCores=4, commonIons=c(), RT
 
   #Parse seed file spectras
   peakSplit<-split(PeakInfoTable,1:nrow(PeakInfoTable))
-  peakSpectraSplit<-lapply(peakSplit, function(a) strsplit(a[[7]]," "))
+  peakSpectraSplit<-lapply(peakSplit, function(a) strsplit(a[[8]]," "))
   peakSpectraSplit<-lapply(peakSpectraSplit, function(b) lapply(b, function(c) strsplit(c,":")))
   peakSpectraSplit<-lapply(peakSpectraSplit, function(d) t(matrix(unlist(d),nrow=2)))
   peakSpectraSplit<-lapply(peakSpectraSplit, function(d) d[order(d[,1]),])

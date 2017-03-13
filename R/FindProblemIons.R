@@ -25,8 +25,8 @@ FindProblemIons<-function(inputFile, possibleIons=c(70:600), numCores=1, absentI
 
   #Read in and format input file
   currentRawFile<-read.table(inputFile, header=T, sep="\t", fill=T, quote="",strip.white = T, stringsAsFactors = F)
-  currentRawFile[,4]<-as.character(currentRawFile[,4])
-  currentRawFile<-currentRawFile[which(!is.na(currentRawFile[,3])&nchar(currentRawFile[,4])!=0),]
+  currentRawFile[,5]<-as.character(currentRawFile[,5])
+  currentRawFile<-currentRawFile[which(!is.na(currentRawFile[,3])&nchar(currentRawFile[,5])!=0),]
   currentRawFile[,2]<-as.character(currentRawFile[,2])
 
   #Parse retention times
@@ -43,7 +43,7 @@ FindProblemIons<-function(inputFile, possibleIons=c(70:600), numCores=1, absentI
 
   #Parse ion spectra column into list of numeric vectors
   currentRawFileSplit<-split(currentRawFile,1:nrow(currentRawFile))
-  spectraSplit<-lapply(currentRawFileSplit, function(a) strsplit(a[[4]]," "))
+  spectraSplit<-lapply(currentRawFileSplit, function(a) strsplit(a[[5]]," "))
   spectraSplit<-lapply(spectraSplit, function(b) lapply(b, function(c) strsplit(c,":")))
   spectraSplit<-lapply(spectraSplit, function(d) t(matrix(unlist(d),nrow=2)))
   spectraSplit<-lapply(spectraSplit, function(d) d[order(d[,1]),])
