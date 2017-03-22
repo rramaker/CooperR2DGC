@@ -218,6 +218,13 @@ ConsensusAlign<-function(inputFileList,
     #Loop back through input files and find matches above similarityCutoff threshold
     for(File in inputFileList[-seed]){
       currentRawFile<-RawFileList[[File]]
+      currentRawFileSplit<-split(currentRawFile,1:nrow(currentRawFile))
+      spectraSplit<-lapply(currentRawFileSplit, function(a) strsplit(a[[5]]," "))
+      spectraSplit<-lapply(spectraSplit, function(b) lapply(b, function(c) strsplit(c,":")))
+      spectraSplit<-lapply(spectraSplit, function(d) t(matrix(unlist(d),nrow=2)))
+      spectraSplit<-lapply(spectraSplit, function(d) d[order(d[,1]),])
+      spectraSplit<-lapply(spectraSplit, function(d) d[which(!d[,1]%in%commonIons),])
+      spectraSplit<-lapply(spectraSplit, function(d) apply(d,2,as.numeric))
 
       #Find best matches and mate pairs for each metabolite and remove inferior matches if metabolite is matched twice
       MatchScores<-apply(SimCutoffs[[File]],2,function(x) max(x,na.rm=T))
@@ -279,7 +286,7 @@ ConsensusAlign<-function(inputFileList,
       #Add new metabolite spectras to seed file spectra list
       seedRawFile<-rbind(seedRawFile,currentRawFile[which(MatchScores<disimilarityCutoff),])
       if(length(which(MatchScores<disimilarityCutoff))>0){
-        SeedspectraSplit[(length(SeedspectraSplit)+1):(length(SeedspectraSplit)+length(which(MatchScores<disimilarityCutoff)))]<- spectraSplit[which(MatchScores<disimilarityCutoff)]
+        SeedspectraSplit[as.character((length(SeedspectraSplit)+1):(length(SeedspectraSplit)+length(which(MatchScores<disimilarityCutoff))))]<- spectraSplit[which(MatchScores<disimilarityCutoff)]
       }
     }
 

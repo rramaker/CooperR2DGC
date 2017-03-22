@@ -67,6 +67,9 @@ Find_FAME_Standards<-function(inputFileList, FAME_Frame=system.file("extdata", "
     if(sum(apply(SimilarityMatrix,1,max)<similarityCutoffWarningThreshold)>1){
       message(paste0("Potential Problem Match: ", FAMES[which(apply(SimilarityMatrix,1,max)<similarityCutoffWarningThreshold),1], "  "))
     }
+    if(sum(duplicated(apply(SimilarityMatrix,1,which.max)))>0){
+      message(paste0("A FAME peak is missing in ",File))
+    }
     currentRawFile[apply(SimilarityMatrix,1,which.max),1]<-as.character(FAMES[,1])
     write.table(currentRawFile[,c(1:5)], paste0(File,"_FAME_appended.txt"),sep="\t",row.names=F,quote=F)
   }
