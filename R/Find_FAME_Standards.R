@@ -26,11 +26,14 @@ Find_FAME_Standards<-function(inputFileList, FAME_Frame=system.file("extdata", "
   FAMESspectraSplit<-lapply(FAMESFileSplit, function(a) strsplit(a[[3]]," "))
   FAMESspectraSplit<-lapply(FAMESspectraSplit, function(b) lapply(b, function(c) strsplit(c,":")))
   FAMESspectraSplit<-lapply(FAMESspectraSplit, function(d) t(matrix(unlist(d),nrow=2)))
-  FAMESspectraSplit<-lapply(FAMESspectraSplit, function(d) d[order(d[,1]),])
   FAMESspectraSplit<-lapply(FAMESspectraSplit, function(d) apply(d,2,as.numeric))
+  FAMESspectraSplit<-lapply(FAMESspectraSplit, function(d) d[order(d[,1]),2,drop=F])
+  FAMESspectraFrame<-do.call(cbind,FAMESspectraSplit)
+  FAMESspectraFrame<-t(FAMESspectraFrame)
+  FAMESspectraFrame<-as.matrix(FAMESspectraFrame)/sqrt(apply((as.matrix(FAMESspectraFrame))^2,1,sum))
 
-  for(File in inputFileList){
-    print(File)
+
+  AnnotateFAMES<-function(File){
     currentRawFile<-read.table(File, sep="\t", fill=T, quote="",strip.white = T, stringsAsFactors = F,header=T)
     currentRawFile[,5]<-as.character(currentRawFile[,5])
     currentRawFile<-currentRawFile[which(!is.na(currentRawFile[,3])&nchar(currentRawFile[,5])!=0),]
@@ -53,12 +56,14 @@ Find_FAME_Standards<-function(inputFileList, FAME_Frame=system.file("extdata", "
     spectraSplit<-lapply(currentRawFileSplit, function(a) strsplit(a[[5]]," "))
     spectraSplit<-lapply(spectraSplit, function(b) lapply(b, function(c) strsplit(c,":")))
     spectraSplit<-lapply(spectraSplit, function(d) t(matrix(unlist(d),nrow=2)))
-    spectraSplit<-lapply(spectraSplit, function(d) d[order(d[,1]),])
     spectraSplit<-lapply(spectraSplit, function(d) apply(d,2,as.numeric))
+    spectraSplit<-lapply(spectraSplit, function(d) d[order(d[,1]),2,drop=F])
 
     #CalcSims
-    SimilarityScores<-mclapply(spectraSplit, function(e) lapply(FAMESspectraSplit, function(d) ((e[,2]%*%d[,2])/(sqrt(sum(e[,2]*e[,2]))*sqrt(sum(d[,2]*d[,2]))))*100), mc.cores=numCores)
-    SimilarityMatrix<-matrix(unlist(SimilarityScores), nrow=nrow(FAMES))
+    spectraFrame<-do.call(cbind,spectraSplit)
+    spectraFrame<-t(spectraFrame)
+    spectraFrame<-as.matrix(spectraFrame)/sqrt(apply((as.matrix(spectraFrame))^2,1,sum))
+    SimilarityMatrix<-(FAMESspectraFrame %*% t(spectraFrame))*100
 
     #Calculate pairwise RT penalties for each current file metabolite and seed file metabolites
     RT1Index<-matrix(unlist(lapply(currentRawFile[,6],function(x) abs(x-FAMES[,4])*RT1Penalty)),nrow=nrow(FAMES))
@@ -73,4 +78,5 @@ Find_FAME_Standards<-function(inputFileList, FAME_Frame=system.file("extdata", "
     currentRawFile[apply(SimilarityMatrix,1,which.max),1]<-as.character(FAMES[,1])
     write.table(currentRawFile[,c(1:5)], paste0(File,"_FAME_appended.txt"),sep="\t",row.names=F,quote=F)
   }
+  EmptyReturn<-mclapply(inputFileList, AnnotateFAMES, mc.cores = numCores)
 }
