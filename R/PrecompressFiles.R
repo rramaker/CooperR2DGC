@@ -89,7 +89,7 @@ PrecompressFiles<-function(inputFileList, RT1Penalty=1, RT2Penalty=10,similarity
         #Find mate partner to combine
         toBind<-importedFiles[[SampNum]][[1]][which(!is.na(Mates)),]
         #Add peak info to combinedList to for output
-        combinedList[[File]]<-cbind(toBind,importedFiles[[SampNum]][[1]][unlist(Mates[which(!is.na(Mates))]),],File)
+        combinedList[[inputFileList[SampNum]]]<-cbind(toBind,importedFiles[[SampNum]][[1]][unlist(Mates[which(!is.na(Mates))]),],inputFileList[SampNum])
         toBind[,"Bound"]<-rep(NA, nrow(toBind))
         toBindQMs<-toBind[,4]
         toBindSpectra<-importedFiles[[SampNum]][[2]][which(!is.na(Mates))]
@@ -148,27 +148,27 @@ PrecompressFiles<-function(inputFileList, RT1Penalty=1, RT2Penalty=10,similarity
         spectraSplit<-lapply(spectraSplit, function(d) d[which(!d[,1]%in%commonIons),])
         spectraSplit<-lapply(spectraSplit, function(d) apply(d,2,as.numeric))
         spectraSplit<-lapply(spectraSplit, function(d) d[order(d[,1]),2,drop=F])
-        spectraFrame<-do.call(cbind,Sample[[2]])
+        spectraFrame<-do.call(cbind,spectraSplit)
         spectraFrame<-t(spectraFrame)
         spectraFrame<-as.matrix(spectraFrame)/sqrt(apply((as.matrix(spectraFrame))^2,1,sum))
         SimilarityMatrix<-(spectraFrame %*% t(spectraFrame))*100
 
         #Subtract retention time difference penalties from similarity scores
-        RT1Index<-matrix(unlist(lapply(Sample[[1]][,"RT1"],function(x) abs(x-Sample[[1]][,"RT1"])*RT1Penalty)),nrow=nrow(SimilarityMatrix))
-        RT2Index<-matrix(unlist(lapply(Sample[[1]][,"RT2"],function(x) abs(x-Sample[[1]][,"RT2"])*RT2Penalty)),nrow=nrow(SimilarityMatrix))
+        RT1Index<-matrix(unlist(lapply(importedFiles[[SampNum]][[1]][,"RT1"],function(x) abs(x-importedFiles[[SampNum]][[1]][,"RT1"])*RT1Penalty)),nrow=nrow(SimilarityMatrix))
+        RT2Index<-matrix(unlist(lapply(importedFiles[[SampNum]][[1]][,"RT2"],function(x) abs(x-importedFiles[[SampNum]][[1]][,"RT2"])*RT2Penalty)),nrow=nrow(SimilarityMatrix))
         SimilarityMatrix<-SimilarityMatrix-RT1Index-RT2Index
         diag(SimilarityMatrix)<-0
 
         #Repeat peak combination if more combinations are necessary
-        MatchList<-apply(SimilarityMatrix,1,function(x) which(x>=similarityCutoff))
-        if(length(MatchList)>0){
+        NewMatchList<-apply(SimilarityMatrix,1,function(x) which(x>=similarityCutoff))
+        if(length(NewMatchList)>0){
           if(quantMethod=="U"){
-            Mates<-lapply(MatchList,function(x) x[1])
+            Mates<-lapply(NewMatchList,function(x) x[1])
             BindingQMs<-importedFiles[[SampNum]][[1]][unlist(Mates[which(!is.na(Mates))]),4]
             BindingAreas<-importedFiles[[SampNum]][[1]][unlist(Mates[which(!is.na(Mates))]),3]
             BindingSpectra<-spectraSplit[unlist(Mates[which(!is.na(Mates))])]
             toBind<-importedFiles[[SampNum]][[1]][which(!is.na(Mates)),]
-            combinedList[[File]]<-rbind(combinedList[[File]],cbind(toBind,importedFiles[[SampNum]][[1]][unlist(Mates[which(!is.na(Mates))]),],File))
+            combinedList[[inputFileList[SampNum]]]<-rbind(combinedList[[inputFileList[SampNum]]],cbind(toBind,importedFiles[[SampNum]][[1]][unlist(Mates[which(!is.na(Mates))]),],inputFileList[SampNum]))
             toBind[,"Bound"]<-rep(NA, nrow(toBind))
             toBindQMs<-toBind[,4]
             toBindSpectra<-spectraSplit[which(!is.na(Mates))]
@@ -182,10 +182,10 @@ PrecompressFiles<-function(inputFileList, RT1Penalty=1, RT2Penalty=10,similarity
             importedFiles[[SampNum]][[1]]<-rbind(importedFiles[[SampNum]][[1]],toBind[,-ncol(toBind)])
           }
           if(quantMethod=="A"|quantMethod=="T"){
-            Mates<-lapply(MatchList,function(x) x[1])
+            Mates<-lapply(NewMatchList,function(x) x[1])
             BindingAreas<-importedFiles[[SampNum]][[1]][unlist(Mates[which(!is.na(Mates))]),3]
             toBind<-importedFiles[[SampNum]][[1]][which(!is.na(Mates)),]
-            combinedList[[File]]<-rbind(combinedList[[File]],cbind(toBind,importedFiles[[SampNum]][[1]][unlist(Mates[which(!is.na(Mates))]),],File))
+            combinedList[[inputFileList[SampNum]]]<-rbind(combinedList[[inputFileList[SampNum]]],cbind(toBind,importedFiles[[SampNum]][[1]][unlist(Mates[which(!is.na(Mates))]),],inputFileList[SampNum]))
             toBind[,"Bound"]<-rep(NA, nrow(toBind))
             toBind[,3]<-toBind[,3]+BindingAreas
             toBind$Bound<-paste(toBind$Bound,apply(cbind(unlist(Mates[which(!is.na(Mates))]),which(!is.na(Mates))),1,min),sep="_")

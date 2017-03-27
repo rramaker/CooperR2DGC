@@ -96,29 +96,6 @@ ConsensusAlign<-function(inputFileList,
   }
   ImportedFiles<-mclapply(inputFileList, ImportFile, mc.cores=numCores)
 
-  #Create empty list for missing retention indices
-  MissingRTIndices<-list()
-  #Loop through each sample and check for missing indexes
-  for(Sample in ImportedFiles){
-    if(!is.null(RT1_Standards)){
-      #Check if all RT1 standards are present
-      if(sum(RT1_Standards%in%Sample[[1]][,1])!=length(RT1_Standards)){
-        MissingRTIndices[[File]]<-RT1_Standards[which(!RT1_Standards%in%Sample[[1]][,1])]
-      }
-    }
-    if(!is.null(RT2_Standards)){
-      #Check if all RT2 standards are present
-      if(sum(RT2_Standards%in%Sample[[1]][,1])!=length(RT2_Standards)){
-        MissingRTIndices[[File]]<-RT2_Standards[which(!RT2_Standards%in%Sample[[1]][,1])]
-      }
-    }
-  }
-  #Error if missing RT indices are present
-  if(length(MissingRTIndices)>0){
-    message("Error: Missing RT indices detected. See output list")
-    return(MissingRTIndices)
-    break
-  }
 
   #Function to calculate pair wise similarity scores between all metabolite spectras
   GenerateSimFrames<-function(Sample, SeedSample){
