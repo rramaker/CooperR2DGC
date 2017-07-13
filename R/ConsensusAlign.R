@@ -90,11 +90,13 @@ ConsensusAlign<-function(inputFileList,
     spectraSplit<-lapply(currentRawFileSplit, function(a) strsplit(a[[5]]," "))
     spectraSplit<-lapply(spectraSplit, function(b) lapply(b, function(c) strsplit(c,":")))
     spectraSplit<-lapply(spectraSplit, function(d) t(matrix(unlist(d),nrow=2)))
-    spectraSplit<-lapply(spectraSplit, function(d) d[which(!d[,1]%in%commonIons),])
+    spectraSplitFilt<-lapply(spectraSplit, function(d) d[which(!d[,1]%in%commonIons),])
+    spectraSplitFilt<-lapply(spectraSplitFilt, function(d) apply(d,2,as.numeric))
+    spectraSplitFilt<-lapply(spectraSplitFilt, function(d) d[order(d[,1]),2,drop=F])
     spectraSplit<-lapply(spectraSplit, function(d) apply(d,2,as.numeric))
     ionNames<-spectraSplit[[1]][order(spectraSplit[[1]][,1]),1]
     spectraSplit<-lapply(spectraSplit, function(d) d[order(d[,1]),2,drop=F])
-    return(list(currentRawFile,spectraSplit, MissingStandards, ionNames))
+    return(list(currentRawFile,spectraSplitFilt, MissingStandards, ionNames, spectraSplit))
   }
   ImportedFiles<-mclapply(inputFileList, ImportFile, mc.cores=numCores)
 
@@ -224,8 +226,8 @@ ConsensusAlign<-function(inputFileList,
         MissingQMList[[inputFileList[SampNum]]]<-cbind(inputFileList[SampNum],which(MatchScores>=similarityCutoff),currentFileQMs,inputFileList[seed],Mates[which(MatchScores>=similarityCutoff)],MatchedSeedQMs)[which(currentFileQMs!=MatchedSeedQMs),]
         #Convert areas proportionally for incongruent quant masses
         currentFileAreas<- ImportedFiles[[SampNum]][[1]][which(MatchScores>=similarityCutoff),3]
-        currentFileSpectra<- ImportedFiles[[SampNum]][[2]][which(MatchScores>=similarityCutoff)]
-        MatchedSeedSpectra<- SeedSample[[2]][Mates[which(MatchScores>=similarityCutoff)]]
+        currentFileSpectra<- ImportedFiles[[SampNum]][[5]][which(MatchScores>=similarityCutoff)]
+        MatchedSeedSpectra<- SeedSample[[5]][Mates[which(MatchScores>=similarityCutoff)]]
         ConvNumerator<-unlist(lapply(1:length(currentFileQMs), function(x) currentFileSpectra[[x]][which(ionNames==currentFileQMs[x])]))
         ConvDenominator<-unlist(lapply(1:length(currentFileQMs), function(x) currentFileSpectra[[x]][which(ionNames==MatchedSeedQMs[x])]))
         ConvDenominator[which(ConvDenominator==0)]<-NA
@@ -296,8 +298,8 @@ ConsensusAlign<-function(inputFileList,
             MissingQMList[[paste0(inputFileList[SampNum],"_MPF")]]<-cbind(inputFileList[SampNum],which(MatchScores>=similarityCutoff),currentFileQMs,inputFileList[seed],Mates[which(MatchScores>=similarityCutoff)],MatchedSeedQMs)[which(currentFileQMs!=MatchedSeedQMs),]
             #Convert areas proportionally for incongruent quant masses
             currentFileAreas<- ImportedFiles[[SampNum]][[1]][names(which(MatchScores>=similarityCutoff)),3]
-            currentFileSpectra<- ImportedFiles[[SampNum]][[2]][names(which(MatchScores>=similarityCutoff))]
-            MatchedSeedSpectra<- SeedSample[[2]][Mates[which(MatchScores>=similarityCutoff)]]
+            currentFileSpectra<- ImportedFiles[[SampNum]][[5]][names(which(MatchScores>=similarityCutoff))]
+            MatchedSeedSpectra<- SeedSample[[5]][Mates[which(MatchScores>=similarityCutoff)]]
             ConvNumerator<-unlist(lapply(1:length(currentFileQMs), function(x) currentFileSpectra[[x]][which(ionNames==currentFileQMs[x])]))
             ConvDenominator<-unlist(lapply(1:length(currentFileQMs), function(x) currentFileSpectra[[x]][which(ionNames==MatchedSeedQMs[x])]))
             ConvDenominator[which(ConvDenominator==0)]<-NA
