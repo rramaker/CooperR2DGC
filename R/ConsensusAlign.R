@@ -42,6 +42,7 @@ ConsensusAlign<-function(inputFileList,
 
   #Function to import files
   ImportFile<-function(File){
+    MissingStandards<-c()
     #Read in file
     currentRawFile<-read.table(File, sep="\t", fill=T, quote="",strip.white = T, stringsAsFactors = F,header=T)
     currentRawFile[,5]<-as.character(currentRawFile[,5])
@@ -62,8 +63,8 @@ ConsensusAlign<-function(inputFileList,
     if(!is.null(RT1_Standards)){
       #Check if all RT1 standards are present in each file
       if(sum(RT1_Standards%in%currentRawFile[,1])!=length(RT1_Standards)){
-        message(paste("Seed file missing RT1 standards:",RT1_Standards[which(!RT1_Standards%in%currentRawFile[,1])],sep=" "))
-        break
+        MissingStandards<-c(MissingStandards,paste(File,"file missing RT1 standards:",RT1_Standards[which(!RT1_Standards%in%currentRawFile[,1])]," ",sep=" "))
+        #break
       }
       #Index each metabolite by RT1 Standards
       RT1_Length<-max(currentRawFile[which(currentRawFile[,1]%in%RT1_Standards),6])-min(currentRawFile[which(currentRawFile[,1]%in%RT1_Standards),6])
@@ -75,8 +76,8 @@ ConsensusAlign<-function(inputFileList,
     if(!is.null(RT2_Standards)){
       #Check if all RT2_Standards are present
       if(sum(RT2_Standards%in%currentRawFile[,1])!=length(RT2_Standards)){
-        message(paste("Seed file missing RT2 standards:",RT2_Standards[which(!RT2_Standards%in%currentRawFile[,1])],sep=" "))
-        break
+        MissingStandards<-c(MissingStandards,paste(File,"file missing RT2 standards:",RT2_Standards[which(!RT2_Standards%in%currentRawFile[,1])]," ",sep=" "))
+        #break
       }
       #Index each metabolite by RT2 standards
       RT2_Length<-max(currentRawFile[which(currentRawFile[,1]%in%RT2_Standards),6])-min(currentRawFile[which(currentRawFile[,1]%in%RT2_Standards),6])
@@ -91,11 +92,19 @@ ConsensusAlign<-function(inputFileList,
     spectraSplit<-lapply(spectraSplit, function(d) t(matrix(unlist(d),nrow=2)))
     spectraSplit<-lapply(spectraSplit, function(d) d[which(!d[,1]%in%commonIons),])
     spectraSplit<-lapply(spectraSplit, function(d) apply(d,2,as.numeric))
+    ionNames<-spectraSplit[[1]][order(spectraSplit[[1]][,1]),1]
     spectraSplit<-lapply(spectraSplit, function(d) d[order(d[,1]),2,drop=F])
-    return(list(currentRawFile,spectraSplit))
+    return(list(currentRawFile,spectraSplit, MissingStandards, ionNames))
   }
   ImportedFiles<-mclapply(inputFileList, ImportFile, mc.cores=numCores)
 
+  MissingFileList<-c()
+  for(File in ImportedFiles){
+    MissingFileList<-c(MissingFileList,File[3])
+  }
+  if(length(unlist(MissingFileList))>0){
+    stop(unlist(MissingFileList), call.=FALSE)
+  }
 
   #Function to calculate pair wise similarity scores between all metabolite spectras
   GenerateSimFrames<-function(Sample, SeedSample){
@@ -194,6 +203,7 @@ ConsensusAlign<-function(inputFileList,
     MissingQMList<-list()
     #Loop back through input files and find matches above similarityCutoff threshold
     for(SampNum in 1:length(ImportedFiles)){
+      ionNames<-ImportedFiles[[SampNum]][[4]]
       #Find best seed sample match scores
       MatchScores<-apply(SimCutoffs[[SampNum]],2,function(x) max(x,na.rm=T))
       #Find current sample metabolites with best match
@@ -216,8 +226,8 @@ ConsensusAlign<-function(inputFileList,
         currentFileAreas<- ImportedFiles[[SampNum]][[1]][which(MatchScores>=similarityCutoff),3]
         currentFileSpectra<- ImportedFiles[[SampNum]][[2]][which(MatchScores>=similarityCutoff)]
         MatchedSeedSpectra<- SeedSample[[2]][Mates[which(MatchScores>=similarityCutoff)]]
-        ConvNumerator<-unlist(lapply(1:length(currentFileQMs), function(x) currentFileSpectra[[x]][which(currentFileSpectra[[x]][,1]==currentFileQMs[x]),2]))
-        ConvDenominator<-unlist(lapply(1:length(currentFileQMs), function(x) currentFileSpectra[[x]][which(currentFileSpectra[[x]][,1]==MatchedSeedQMs[x]),2]))
+        ConvNumerator<-unlist(lapply(1:length(currentFileQMs), function(x) currentFileSpectra[[x]][which(ionNames==currentFileQMs[x])]))
+        ConvDenominator<-unlist(lapply(1:length(currentFileQMs), function(x) currentFileSpectra[[x]][which(ionNames==MatchedSeedQMs[x])]))
         ConvDenominator[which(ConvDenominator==0)]<-NA
         #Add matched peaks to final alignment matrix
         FinalMatrix[Mates[which(MatchScores>=similarityCutoff)],inputFileList[SampNum]]<-currentFileAreas*(ConvNumerator/ConvDenominator)
@@ -261,6 +271,7 @@ ConsensusAlign<-function(inputFileList,
 
     #Find peaks with missing values
     for(SampNum in 1:length(ImportedFiles)){
+      ionNames<-ImportedFiles[[SampNum]][[4]]
       MissingPeaks<-which(is.na(FinalMatrix[,inputFileList[SampNum]]))
       if(length(MissingPeaks)>0){
         MatchScores<-apply(SimCutoffs[[SampNum]],2,function(x) max(x,na.rm=T))
@@ -287,8 +298,8 @@ ConsensusAlign<-function(inputFileList,
             currentFileAreas<- ImportedFiles[[SampNum]][[1]][names(which(MatchScores>=similarityCutoff)),3]
             currentFileSpectra<- ImportedFiles[[SampNum]][[2]][names(which(MatchScores>=similarityCutoff))]
             MatchedSeedSpectra<- SeedSample[[2]][Mates[which(MatchScores>=similarityCutoff)]]
-            ConvNumerator<-unlist(lapply(1:length(currentFileQMs), function(x) currentFileSpectra[[x]][which(currentFileSpectra[[x]][,1]==currentFileQMs[x]),2]))
-            ConvDenominator<-unlist(lapply(1:length(currentFileQMs), function(x) currentFileSpectra[[x]][which(currentFileSpectra[[x]][,1]==MatchedSeedQMs[x]),2]))
+            ConvNumerator<-unlist(lapply(1:length(currentFileQMs), function(x) currentFileSpectra[[x]][which(ionNames==currentFileQMs[x])]))
+            ConvDenominator<-unlist(lapply(1:length(currentFileQMs), function(x) currentFileSpectra[[x]][which(ionNames==MatchedSeedQMs[x])]))
             ConvDenominator[which(ConvDenominator==0)]<-NA
             #Add matched peaks to final alignment matrix
             FinalMatrix[Mates[which(MatchScores>=similarityCutoff)],inputFileList[SampNum]]<-currentFileAreas*(ConvNumerator/ConvDenominator)

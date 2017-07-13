@@ -2,7 +2,6 @@
 #'
 #' @param inputFileList Vector of file paths to scan for FAME standards
 #' @param FAME_frame A parsed FAME standard reference file (find at system.file("extdata", "FIND_FAME_FRAME.txt", package="CooperR2DGC"))
-#' @param numCores The number of cores to use for parallel processing. Defaults to 1
 #' @param RT1Penalty Penalty used for first retention time errors.  Defaults to 1.
 #' @param RT2Penalty Penalty used for first retention time errors.  Defaults to 10.
 #' @param similarityCutoffWarningThreshold Similarity score threshold at which to print a warning for user to double check FAME peak for a sample. Defaults to 85.
@@ -12,7 +11,7 @@
 #' @export
 
 
-Find_FAME_Standards<-function(inputFileList, FAME_Frame=system.file("extdata", "FIND_FAME_FRAME.txt", package="CooperR2DGC"), numCores=4, RT1Penalty=1, RT2Penalty=10, similarityCutoffWarningThreshold=80){
+Find_FAME_Standards<-function(inputFileList, FAME_Frame=system.file("extdata", "FIND_FAME_FRAME.txt", package="CooperR2DGC"), RT1Penalty=1, RT2Penalty=10, similarityCutoffWarningThreshold=80){
   FAMES<-read.table(FAME_Frame,sep="\t",header=T)
   FAMES[,2]<-as.character(FAMES[,2])
   RTSplit<-data.frame(strsplit(FAMES[,2], " , "), stringsAsFactors = F)
@@ -78,5 +77,5 @@ Find_FAME_Standards<-function(inputFileList, FAME_Frame=system.file("extdata", "
     currentRawFile[apply(SimilarityMatrix,1,which.max),1]<-as.character(FAMES[,1])
     write.table(currentRawFile[,c(1:5)], paste0(substr(File,1,nchar(File)-4),"_FAME_appended.txt"),sep="\t",row.names=F,quote=F)
   }
-  EmptyReturn<-mclapply(inputFileList, AnnotateFAMES, mc.cores = numCores)
+  EmptyReturn<-lapply(inputFileList, AnnotateFAMES)
 }

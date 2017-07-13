@@ -49,8 +49,9 @@ PrecompressFiles<-function(inputFileList, RT1Penalty=1, RT2Penalty=10,similarity
     spectraSplit<-lapply(spectraSplit, function(d) t(matrix(unlist(d),nrow=2)))
     spectraSplit<-lapply(spectraSplit, function(d) d[which(!d[,1]%in%commonIons),])
     spectraSplit<-lapply(spectraSplit, function(d) apply(d,2,as.numeric))
+    ionNames<-spectraSplit[[1]][order(spectraSplit[[1]][,1]),1]
     spectraSplit<-lapply(spectraSplit, function(d) d[order(d[,1]),2,drop=F])
-    return(list(currentRawFile,spectraSplit))
+    return(list(currentRawFile,spectraSplit, ionNames))
   }
   importedFiles<-mclapply(inputFileList, ImportFile, mc.cores=numCores)
 
@@ -85,6 +86,7 @@ PrecompressFiles<-function(inputFileList, RT1Penalty=1, RT2Penalty=10,similarity
         BindingQMs<-importedFiles[[SampNum]][[1]][unlist(Mates[which(!is.na(Mates))]),4]
         BindingAreas<-importedFiles[[SampNum]][[1]][unlist(Mates[which(!is.na(Mates))]),3]
         BindingSpectra<-importedFiles[[SampNum]][[2]][unlist(Mates[which(!is.na(Mates))])]
+        ionNames<-importedFiles[[SampNum]][[3]]
 
         #Find mate partner to combine
         toBind<-importedFiles[[SampNum]][[1]][which(!is.na(Mates)),]
@@ -95,8 +97,8 @@ PrecompressFiles<-function(inputFileList, RT1Penalty=1, RT2Penalty=10,similarity
         toBindSpectra<-importedFiles[[SampNum]][[2]][which(!is.na(Mates))]
 
         #Perform proportional conversion to adjust peak areas with differing unique masses
-        ConvNumerator<-unlist(lapply(1:length(toBindQMs), function(x) toBindSpectra[[x]][which(toBindSpectra[[x]][,1]==toBindQMs[x]),2]))
-        ConvDenominator<-unlist(lapply(1:length(toBindQMs), function(x) toBindSpectra[[x]][which(toBindSpectra[[x]][,1]==BindingQMs[x]),2]))
+        ConvNumerator<-unlist(lapply(1:length(toBindQMs), function(x) toBindSpectra[[x]][which(ionNames==toBindQMs[x])]))
+        ConvDenominator<-unlist(lapply(1:length(toBindQMs), function(x) toBindSpectra[[x]][which(ionNames==BindingQMs[x])]))
         ConvDenominator[which(ConvDenominator==0)]<-NA
         toBind[,3]<-(toBind[,3]*(ConvNumerator/ConvDenominator))+BindingAreas
 
@@ -172,8 +174,8 @@ PrecompressFiles<-function(inputFileList, RT1Penalty=1, RT2Penalty=10,similarity
             toBind[,"Bound"]<-rep(NA, nrow(toBind))
             toBindQMs<-toBind[,4]
             toBindSpectra<-spectraSplit[which(!is.na(Mates))]
-            ConvNumerator<-unlist(lapply(1:length(toBindQMs), function(x) toBindSpectra[[x]][which(toBindSpectra[[x]][,1]==toBindQMs[x]),2]))
-            ConvDenominator<-unlist(lapply(1:length(toBindQMs), function(x) toBindSpectra[[x]][which(toBindSpectra[[x]][,1]==BindingQMs[x]),2]))
+            ConvNumerator<-unlist(lapply(1:length(toBindQMs), function(x) toBindSpectra[[x]][which(ionNames==toBindQMs[x])]))
+            ConvDenominator<-unlist(lapply(1:length(toBindQMs), function(x) toBindSpectra[[x]][which(ionNames==BindingQMs[x])]))
             ConvDenominator[which(ConvDenominator==0)]<-NA
             toBind[,3]<-toBind[,3]*(ConvNumerator/ConvDenominator)
             toBind$Bound<-paste(toBind$Bound,apply(cbind(unlist(Mates[which(!is.na(Mates))]),which(!is.na(Mates))),1,min),sep="_")
@@ -211,4 +213,3 @@ PrecompressFiles<-function(inputFileList, RT1Penalty=1, RT2Penalty=10,similarity
   }
   return(combinedFrame)
 }
-
